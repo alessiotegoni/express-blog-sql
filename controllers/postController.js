@@ -1,4 +1,4 @@
-import { posts } from "../db/posts";
+import { posts } from "../db/posts.js";
 
 export function getPosts(req, res) {
   const { tag } = req.query;
