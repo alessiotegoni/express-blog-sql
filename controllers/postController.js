@@ -53,13 +53,14 @@ export function modifyPost(req, res) {
 export function deletePost(req, res) {
   const { postId } = req.params;
 
-  const findPost = posts.find(
+  const postIndex = posts.findIndex(
     (post) => post.id === parseInt(postId) || post.slug === postId
   );
 
-  if (!findPost) return res.status(404).json({ message: "Post not found" });
+  if (postIndex === -1)
+    return res.status(404).json({ message: "Post not found" });
 
-  console.log(posts.filter((post) => post.id !== parseInt(postId)));
+  posts.splice(postIndex, 1);
 
   res.sendStatus(204);
 }
