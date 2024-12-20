@@ -20,17 +20,17 @@ export const getPosts = asyncHandler(async (req, res) => {
   res.status(200).json(results);
 });
 
-export async function getPost(req, res) {
+export const getPost = asyncHandler(async (req, res) => {
   const { postId } = req.params;
 
-  const findPost = posts.find(
-    (post) => post.id === parseInt(postId) || post.slug === postId
-  );
+  const [[result]] = await conn.execute("SELECT * FROM posts WHERE id = ?", [
+    postId,
+  ]);
 
-  if (!findPost) return res.status(404).json({ message: "Post not found" });
+  if (!result) res.status(404).json({ message: "Post doesn't exist" });
 
-  res.status(200).json(findPost);
-}
+  res.status(200).json(result);
+});
 
 export function createPost(req, res) {
   const { post } = req.body;
@@ -59,17 +59,10 @@ export function modifyPost(req, res) {
   res.status(201).json(posts.with(postIndex, { ...posts[postIndex], ...post }));
 }
 
-export async function deletePost(req, res) {
+export const deletePost = asyncHandler(async (req, res) => {
   const { postId } = req.params;
 
-  const postIndex = posts.findIndex(
-    (post) => post.id === parseInt(postId) || post.slug === postId
-  );
-
-  if (postIndex === -1)
-    return res.status(404).json({ message: "Post not found" });
-
-  posts.splice(postIndex, 1);
+  await conn.execute("DELETE FROM posts WHERE id = ?", [postId]);
 
   res.sendStatus(204);
-}
+});
