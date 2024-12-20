@@ -2,6 +2,7 @@
   "name": "express-blog-intro",
   "version": "1.0.0",
   "main": "main.js",
+  "type": "module",
   "module": "ES6",
   "scripts": {
     "dev": "node --watch ."
@@ -12,6 +13,8 @@
   "description": "",
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.21.1"
+    "express": "^4.21.1",
+    "express-async-handler": "^1.2.0",
+    "mysql2": "^3.11.5"
   }
 }

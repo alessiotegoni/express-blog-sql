@@ -1,17 +1,26 @@
-import { posts } from "../db/posts.js";
+import asyncHandler from "express-async-handler";
+import conn from "../configs/conn.js";
 
-export function getPosts(req, res) {
+export const getPosts = asyncHandler(async (req, res) => {
   const { tag } = req.query;
 
-  let dbPosts = posts;
+  const [results] = await (!tag
+    ? conn.query("SELECT * FROM posts as p")
+    : conn.execute(
+        `SELECT p.*, t.label as tags
+         FROM posts AS p
+         JOIN post_tag AS pt
+         ON pt.post_id = p.id
+         JOIN tags AS t
+         ON t.id = pt.tag_id
+         WHERE t.label = ?`,
+        [tag]
+      ));
 
-  if (tag)
-    dbPosts = dbPosts.filter((post) => post.tags.includes(tag.toLowerCase()));
+  res.status(200).json(results);
+});
 
-  res.status(200).json(dbPosts);
-}
-
-export function getPost(req, res) {
+export async function getPost(req, res) {
   const { postId } = req.params;
 
   const findPost = posts.find(
@@ -50,7 +59,7 @@ export function modifyPost(req, res) {
   res.status(201).json(posts.with(postIndex, { ...posts[postIndex], ...post }));
 }
 
-export function deletePost(req, res) {
+export async function deletePost(req, res) {
   const { postId } = req.params;
 
   const postIndex = posts.findIndex(
